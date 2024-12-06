@@ -39,16 +39,16 @@
         <!-- Right Column: Display Records in a Table -->
         <div class="column table-column">
             <h2>Horse Records Table</h2>
-            <table border="1">
+            <table>
                 <thead>
                     <tr>
-                        <th style="width: 12%;">Horse Number</th>
-                        <th style="width: 12%;">Name</th>
-                        <th style="width: 12%;">Address</th>
-                        <th style="width: 12%;">Organization</th>
-                        <th style="width: 12%;">Age</th>
-                        <th style="width: 12%;">Image</th>
-                        <th style="width: 20%;">Actions</th>
+                        <th>Horse Number</th>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Organization</th>
+                        <!-- <th>Age</th> -->
+                        <th>Image</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,26 +58,24 @@
                         <td>{{ record.name }}</td>
                         <td>{{ record.address }}</td>
                         <td>{{ record.organization }}</td>
-                        <td>{{ record.age }}</td>
+                        <!-- /*<td>{{ record.age }}</td>* -->
                         <td>
                             {% if record.image %}
-                                <img src="{{ url_for('static', filename='images/' + record.image) }}" alt="Horse Image" width="100">
+                            <img src="{{ url_for('static', filename='images/' ~ record.image) }}" alt="Image" width="50" height="50">
                             {% else %}
-                                <img src="{{ url_for('static', filename='images/default.png') }}" alt="No Image Available" width="100">
+                            <span>No Image</span>
                             {% endif %}
                         </td>
-                        <td style="text-align: center;">
-                            <div class="action-buttons">
-                                <a href="/details/{{ record.id }}" class="button details-button">Details</a>
-                                <a href="/edit/{{ record.id }}" class="button edit-button">Edit</a>
-                                <a href="/delete/{{ record.id }}" class="button delete-button">Delete</a>
-                            </div>
+                        <td class="action-buttons">
+                            <a href="{{ url_for('details', id=record.id) }}" class="button details-button">Details</a>
+                            <a href="{{ url_for('edit_record', id=record.id) }}" class="button edit-button">Edit</a>
+                            <a href="{{ url_for('delete_record', id=record.id) }}" class="button delete-button">Delete</a>
                         </td>
-                        
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            
 
             <!-- Pagination Controls -->
             <div class="pagination">

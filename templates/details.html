@@ -3,44 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horse Details</title>
+    <title>Horse Details - {{ record.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/details.css') }}">
 </head>
 <body>
-    <h1>Horse Details</h1>
-    <table>
-        <tr>
-            <td><strong>Horse Number:</strong></td>
-            <td>{{ record.horse_number }}</td>
-        </tr>
-        <tr>
-            <td><strong>Name:</strong></td>
-            <td>{{ record.name }}</td>
-        </tr>
-        <tr>
-            <td><strong>Address:</strong></td>
-            <td>{{ record.address }}</td>
-        </tr>
-        <tr>
-            <td><strong>Organization:</strong></td>
-            <td>{{ record.organization }}</td>
-        </tr>
-        <tr>
-            <td><strong>Age:</strong></td>
-            <td>{{ record.age }}</td>
-        </tr>
-        <tr>
-            <td><strong>Image:</strong></td>
-            <td>
+    <h1 class="details-title">Horse Details</h1>
+
+    <div class="details-container">
+        <!-- Flex container for two columns -->
+        <div class="details-table">
+            <!-- Left column for details -->
+            <div class="details-text">
+                <table>
+                    <tr>
+                        <td><strong>Horse Number:</strong></td>
+                        <td>{{ record.horse_number }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Name:</strong></td>
+                        <td>{{ record.name }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Address:</strong></td>
+                        <td>{{ record.address }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Organization:</strong></td>
+                        <td>{{ record.organization }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Age:</strong></td>
+                        <td>{{ record.age }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Right column for image -->
+            <div class="details-image">
                 {% if record.image %}
-                    <img src="{{ url_for('static', filename='images/' + record.image) }}" alt="Horse Image" width="200">
+                <img src="{{ url_for('static', filename='images/' + record.image) }}" alt="Horse Image">
                 {% else %}
-                    <img src="{{ url_for('static', filename='images/default.png') }}" alt="No Image Available" width="200">
+                <p>No image available</p>
                 {% endif %}
-            </td>
-        </tr>
-    </table>
-    <br>
-    <a href="{{ url_for('index') }}">Back to Records</a>
+            </div>
+        </div>
+
+        <div class="back-button">
+            <a href="{{ url_for('index') }}"><button>Back to Records</button></a>
+        </div>
+    </div>
 </body>
 </html>
-
