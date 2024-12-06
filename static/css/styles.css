@@ -1,0 +1,155 @@
+/* General layout container */
+.container {
+    display: flex; /* Use Flexbox for layout */
+    justify-content: space-between; /* Space between columns */
+    padding: 20px;
+}
+
+/* Left Column: Form */
+.form-column {
+    flex: 1; /* This allows the form column to take up 1/3 of the width */
+    margin-right: 20px; /* Space between the form and table */
+}
+
+/* Right Column: Table */
+.table-column {
+    flex: 2; /* The table takes up 2/3 of the space */
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    padding-left: 20px;
+    padding-right: 10px;
+}
+
+/* General Button Styling */
+.button {
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+/* Action button colors */
+.edit-button {
+    background-color: green;
+    color: white;
+}
+
+.delete-button {
+    background-color: red;
+    color: white;
+}
+
+.details-button {
+    background-color: blue;
+    color: white;
+}
+
+/* Pagination Styles */
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    padding: 5px 15px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    margin: 0 5px;
+    border-radius: 5px;
+}
+
+.pagination a:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination span {
+    margin: 0 10px;
+}
+
+/* Styling for form inputs */
+input[type="number"], input[type="text"], input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Button Styling */
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: auto;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Center the table */
+table {
+    width: 100%;  /* Ensure the table takes up full width */
+    margin: 0 auto;  /* Center the table horizontally */
+    border-collapse: collapse;  /* Optional: For better styling */
+}
+
+/* Center the table headers */
+th {
+    text-align: center;  /* Center the text in the header */
+    padding: 10px;  /* Optional: Adds some padding for better spacing */
+}
+
+/* Center the table data */
+td {
+    text-align: center;  /* Center the text in the table data cells */
+    padding: 10px;  /* Optional: Adds padding for better readability */
+}
+
+/* Optional: Adding borders to make the table more visible */
+table, th, td {
+    border: 1px solid black;
+}
+
+/* Styling for the action buttons inside table cells */
+td .action-buttons {
+    display: flex;
+    flex-direction: rows; /* Stack buttons vertically */
+    align-items: center; /* Center the buttons horizontally */
+    justify-content: center;
+}
+
+/* Adjust button widths and spacing inside table cells */
+td .action-buttons a {
+    width: auto; /* Allow buttons to take only necessary space */
+    padding: 8px 16px;
+    margin-bottom: 5px; /* Space between buttons */
+    text-align: center;
+}
+
+/* Action buttons specific styles */
+.details-button {
+    background-color: rgb(64, 64, 233);
+    color: white;
+}
+
+.edit-button {
+    background-color: rgb(47, 184, 47);
+    color: white;
+}
+
+.delete-button {
+    background-color: rgb(245, 57, 57);
+    color: white;
+}
+/* Limit image size within table */
+td img {
+    width: 50px;  /* Set the width to 10px */
+    height: 50px;  /* Set the height to 10px */
+    object-fit: cover;  /* Optional: ensures images are cropped to fit the dimensions */
+    border-radius: 5px;
+}

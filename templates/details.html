@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horse Details</title>
+</head>
+<body>
+    <h1>Horse Details</h1>
+    <table>
+        <tr>
+            <td><strong>Horse Number:</strong></td>
+            <td>{{ record.horse_number }}</td>
+        </tr>
+        <tr>
+            <td><strong>Name:</strong></td>
+            <td>{{ record.name }}</td>
+        </tr>
+        <tr>
+            <td><strong>Address:</strong></td>
+            <td>{{ record.address }}</td>
+        </tr>
+        <tr>
+            <td><strong>Organization:</strong></td>
+            <td>{{ record.organization }}</td>
+        </tr>
+        <tr>
+            <td><strong>Age:</strong></td>
+            <td>{{ record.age }}</td>
+        </tr>
+        <tr>
+            <td><strong>Image:</strong></td>
+            <td>
+                {% if record.image %}
+                    <img src="{{ url_for('static', filename='images/' + record.image) }}" alt="Horse Image" width="200">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default.png') }}" alt="No Image Available" width="200">
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    <br>
+    <a href="{{ url_for('index') }}">Back to Records</a>
+</body>
+</html>
+
