@@ -1,0 +1,112 @@
+/* General Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Page Title Styling */
+.details-title {
+    font-size: 32px;
+    color: #fff;
+    text-align: center;
+    margin: 20px 0;
+    background-color: #5197d1;
+    padding: 15px;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Details Container */
+.details-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Flex Layout for Two Columns */
+.details-table {
+    display: flex;
+    justify-content: space-between; /* Space between columns */
+    gap: 20px; /* Space between the two columns */
+    align-items: flex-start; /* Aligns items to the top */
+}
+
+/* Left Column for Text Details */
+.details-text {
+    flex: 1;
+    min-width: 60%;
+}
+
+.details-text table {
+    width: 100%;
+}
+
+.details-text td {
+    padding: 10px 0;
+    font-size: 16px;
+}
+
+.details-text td:first-child {
+    font-weight: bold;
+    color: #555;
+    width: 40%; /* Adjusts width for the first column */
+}
+
+/* Right Column for Image */
+.details-image {
+    flex: 1;
+    min-width: 35%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.details-image img {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Back Button Styling */
+.back-button {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back-button button {
+    padding: 12px 25px;
+    background-color: #2ac92f;
+    border: none;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.back-button button:hover {
+    background-color: #38f13e;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .details-table {
+        flex-direction: column; /* Stacks the columns on smaller screens */
+    }
+
+    .details-text,
+    .details-image {
+        min-width: 100%;
+    }
+
+    .details-image img {
+        width: 180px;
+        height: 180px;
+    }
+}
