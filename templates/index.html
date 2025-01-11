@@ -4,21 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horse Records</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
     <h1>Horse Records</h1>
 
     <div class="container">
+        {% if error_message %}
+        <div class="error-message" style="color: red;">
+            {{ error_message }}
+        </div>
+        {% endif %}
         <!-- Left Column: Add New Record Form -->
-        <div class="column form-column">
+        <div class="form-column">
             <h2>Add New Record</h2>
             <form action="/add" method="POST" enctype="multipart/form-data">
                 <label for="horse_number">Horse Number:</label>
-                <input type="number" id="horse_number" name="horse_number" required min="1" step="1" >
+                <input type="number" id="horse_number" name="horse_number" required min="1" step="1">
 
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required >
+                <input type="text" id="name" name="name" required>
 
                 <label for="address">Address:</label>
                 <input type="text" id="address" name="address" required>
@@ -27,9 +33,9 @@
                 <input type="text" id="organization" name="organization" required>
 
                 <label for="age">Age:</label>
-                <input type="number" id="age" name="age" required min="1" step="1" >
+                <input type="number" id="age" name="age" required min="1" step="1">
 
-                <label for="image">Upload Image (Optional):</label>
+                <label for="image">Upload Image:</label>
                 <input type="file" id="image" name="image" accept="image/*">
 
                 <button type="submit">Add Record</button>
@@ -37,8 +43,23 @@
         </div>
 
         <!-- Right Column: Display Records in a Table -->
-        <div class="column table-column">
-            <h2>Horse Records Table</h2>
+        <div class="table-column">
+            <div class="header-table">
+                <h2>Horse Records Table</h2>
+                <div class="button-container">
+                    <a id="leaderboard-button" href="{{ url_for('leaderboard') }}" target="_blank" class="button">
+                        <i class="fas fa-trophy"></i> 
+                        View Leaderboard
+                    </a>
+                    <form action="{{ url_for('race') }}" method="get" style="flex: 1;">
+                        <button id="race-button" type="submit" class="button">
+                            <i class="fas fa-flag-checkered"></i> 
+                            Race
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
             <table>
                 <thead>
                     <tr>
@@ -58,7 +79,7 @@
                         <td>{{ record.name }}</td>
                         <td>{{ record.address }}</td>
                         <td>{{ record.organization }}</td>
-                        <!-- /*<td>{{ record.age }}</td>* -->
+                        <!-- <td>{{ record.age }}</td> -->
                         <td>
                             {% if record.image %}
                             <img src="{{ url_for('static', filename='images/' ~ record.image) }}" alt="Image" width="50" height="50">
@@ -75,20 +96,27 @@
                     {% endfor %}
                 </tbody>
             </table>
-            
 
-            <!-- Pagination Controls -->
             <div class="pagination">
+
+                <div class="pagination-info">
+                    <span>Total Racers: {{ total_racers }}</span>
+                </div>
+
                 {% if page > 1 %}
-                    <a href="{{ url_for('index', page=page-1) }}">Prev</a>
+                    <a href="{{ url_for('index', page=page-1) }}">Previous</a>
                 {% endif %}
+                
                 <span>Page {{ page }} of {{ total_pages }}</span>
+                
                 {% if page < total_pages %}
                     <a href="{{ url_for('index', page=page+1) }}">Next</a>
                 {% endif %}
             </div>
+            
+
+            
         </div>
     </div>
 </body>
 </html>
-

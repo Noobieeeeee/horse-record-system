@@ -16,6 +16,38 @@ h1 {
     margin: 0;
 }
 
+/* Flex Container for Heading and Button */
+.heading-container {
+    display: flex;
+    justify-content: space-between; /* Distributes space between items */
+    align-items: center; /* Vertically centers the items */
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+
+.heading-container h2 {
+    margin: 0; /* Removes default margin */
+}
+
+.heading-container button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center; /* Align icon and text */
+}
+
+.heading-container button i {
+    margin-right: 5px; /* Add space between icon and text */
+}
+
+.heading-container button:hover {
+    background-color: #ddd; /* Hover effect */
+}
+
 /* General Layout Container */
 .container {
     max-width: 1250px;
@@ -36,7 +68,6 @@ h1 {
     border-radius: 8px;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    
 }
 
 /* Table Column (2/3 width) */
@@ -44,7 +75,7 @@ h1 {
     flex: 2;
     padding: 20px;
     border-radius: 8px;
-    background-color: #fff;
+    background-color: #ffffff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -101,7 +132,6 @@ th {
     padding: 12px;
     text-align: center;
     font-size: 14px;
-    /* font-weight: bold; */
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -153,6 +183,19 @@ table td img {
     color: #fff;
     font-size: 14px;
     transition: background-color 0.3s ease;
+}
+
+#leaderboard-button {
+    background-color: #5197d1;
+    border: none;
+    cursor: pointer;
+    display:block;
+    align-items: center; /* Aligns the icon and the text */
+    gap: 10px; /* Adds space between icon and text */
+}
+
+#leaderboard-button:hover {
+    background-color: #0857aa;
 }
 
 .details-button {
@@ -223,4 +266,55 @@ table td img {
         width: 40px;
         height: 40px;
     }
+}
+
+/* Add styling to ensure the buttons are displayed side by side */
+.header-table form {
+    display: flex;
+    gap: 10px; /* Adds space between the buttons */
+    /* margin-top: 2px; */
+    /* padding-top: 2px; */
+}
+
+.pagination-info {
+    font-size: 16px;
+    font-weight: bold;
+    padding-top: 1%;
+    color: #555;
+    margin: 10px 0;
+    text-align: left;
+}
+
+.button-container {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+}
+
+.button-container .button, .button-container button {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+#leaderboard-button {
+    background-color: #5197d1;
+}
+
+#leaderboard-button:hover {
+    background-color: #0857aa;
+}
+
+#race-button {
+    background-color: #28a745;
+}
+
+#race-button:hover {
+    background-color: #218838;
 }

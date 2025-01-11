@@ -1,0 +1,297 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    /*background-color: #333; /* Dark grey background */
+    /* background-image: url('background.png'); Path to your background image */
+    background-image: url('/resources/background.png'); /* Path to the background image in the resources folder */
+    background-size: cover; /* Ensure the image covers the entire page */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Prevent repetition of the image */
+    color: #333; /* Dark text */
+    margin: 0;
+    padding: 0;
+  }
+  /* Import font and general styles */
+  @import url("https://fonts.googleapis.com/css?family=Raleway:400");
+  
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 90deg;
+    inherits: true;
+  }
+  
+  @property --gradX {
+    syntax: '<percentage>';
+    initial-value: 50%;
+    inherits: true;
+  }
+  
+  @property --gradY {
+    syntax: '<percentage>';
+    initial-value: 0%;
+    inherits: true;
+  }
+  
+  :root {
+    --d: 2500ms;
+    --angle: 90deg;
+    --gradX: 100%;
+    --gradY: 50%;
+    --c1: silver; /* Teal */
+    --c2: rgba(172, 172, 172, 0.1); /* Medium grey with transparency */
+  }
+  
+  /* Updated container style */
+  .container {
+    width: 80%;
+    margin: 40px auto;
+    background-color: rgba(255, 255, 255, 0.9); /* Light background with opacity */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft black shadow */
+    font-family: Raleway, sans-serif;
+  
+    /* Gradient animation border */
+    border: 0.35rem solid;
+    padding: 2rem;
+    border-image: conic-gradient(from var(--angle), var(--c2), var(--c1) 0.1turn, var(--c1) 0.15turn, var(--c2) 0.25turn) 30;
+    animation: borderRotate var(--d) linear infinite forwards;
+    max-width: 100%; /* Ensure it doesn't exceed the screen width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+  
+  /* Alternative radial gradient for effect */
+  .container.alternate {
+    border-image: radial-gradient(
+        ellipse at var(--gradX) var(--gradY),
+        var(--c1),
+        var(--c1) 10%,
+        var(--c2) 40%
+      )
+      30;
+    animation: borderRadial var(--d) linear infinite forwards;
+  }
+  
+  /* Keyframes for animations */
+  @keyframes borderRotate {
+    100% {
+      --angle: 420deg;
+    }
+  }
+  
+  @keyframes borderRadial {
+    20% {
+      --gradX: 100%;
+      --gradY: 50%;
+    }
+    40% {
+      --gradX: 100%;
+      --gradY: 100%;
+    }
+    60% {
+      --gradX: 50%;
+      --gradY: 100%;
+    }
+    80% {
+      --gradX: 0%;
+      --gradY: 50%;
+    }
+    100% {
+      --gradX: 50%;
+      --gradY: 0%;
+    }
+  }
+  
+  h1 {
+    text-align: center;
+    color: #ff4500; /* Bright orange */
+    font-size: 50px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    color: #333; /* Dark text */
+  }
+  
+  th {
+    height: 40px;
+    background-color: #ff4500; /* Bright orange for header */
+    color: #fff; /* White text */
+  }
+  
+  td {
+    border-bottom: 1px solid #ccc; /* Light grey border for rows */
+  }
+  
+  img {
+    width: 30px;
+    height: 30px;
+    border-radius: 10%;
+  }
+  
+  .rank-1 {
+    background: linear-gradient(45deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1)) !important;
+    color: gold !important;
+    font-weight: bold;
+}
+
+.rank-2 {
+    background: linear-gradient(45deg, rgba(192, 192, 192, 0.3), rgba(192, 192, 192, 0.1)) !important;
+    color: silver !important;
+    font-weight: bold;
+}
+
+.rank-3 {
+    background: linear-gradient(45deg, rgba(205, 127, 50, 0.3), rgba(205, 127, 50, 0.1)) !important;
+    color: #cd7f32 !important;
+    font-weight: bold;
+}
+
+  /* Pagination Styles */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    background-color: #ff4500; /* Bright orange button background */
+    color: #fff; /* White text */
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #ff6347; /* Lighter orange button on hover */
+  }
+  
+  button:disabled {
+    background-color: #ffa07a; /* Disabled button color */
+    cursor: not-allowed;
+  }
+  
+  /* Ensure that the rows fit without scroll */
+  tr {
+    height: 35px;
+    background-color: #fff; /* White row background */
+  }
+  
+  /* Style for rows on hover */
+  tr:hover {
+    background-color: #f0f0f0; /* Slightly lighter grey on hover */
+  }
+
+  /* Added more details here for css. changed dec24
+  */
+  .back-button {
+    background-color: #ff4500;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+    /* padding-top: 20px; */
+    margin-top: 20px;
+}
+
+.back-button:hover {
+    background-color: #ff6347;
+}
+#leaderboard td:nth-child(2) {
+  text-align: left; /* Align rider name and number to the left */
+  padding-left: 20px;
+}
+  
+
+@media (max-width: 1200px) {
+  .container {
+      width: 90%;
+      padding: 1.5rem;
+  }
+
+  th, td {
+      padding: 8px;
+      font-size: 24px;
+  }
+
+  h1 {
+      font-size: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+      width: 95%;
+      padding: 1rem;
+  }
+
+  th, td {
+      padding: 6px;
+      font-size: 18px;
+  }
+
+  h1 {
+      font-size: 30px;
+  }
+
+  .rider-image {
+      width: 30px;
+      height: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+      width: 100%;
+      padding: 0.5rem;
+  }
+
+  th, td {
+      padding: 4px;
+      font-size: 14px;
+  }
+
+  h1 {
+      font-size: 24px;
+  }
+
+  .rider-image {
+      width: 20px;
+      height: 20px;
+  }
+}
+
+  #leaderboard thead th {
+    background-color: #ff4500;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#leaderboard tbody tr:hover {
+  background-color: rgba(255, 69, 0, 0.2);
+  transition: background-color 0.3s ease;
+}

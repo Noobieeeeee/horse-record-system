@@ -1,0 +1,152 @@
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #F1F0FB;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    color: #333333;
+}
+
+h1 {
+    text-align: center;
+    color: #333333;
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: #8E9196;
+}
+
+.container {
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Add margin to the second form */
+form + form {
+    margin-top: 1.5rem;
+}
+
+label {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #8E9196;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+select {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #F1F0FB;
+    background: #FFFFFF;
+    color: #333333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+select:hover, select:focus {
+    border-color: #74e07a;
+    outline: none;
+}
+
+button, .button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #4CAF50;
+    color: #FFFFFF;
+}
+
+.hidden-checkbox {
+    display: none;
+}
+
+#race-ready-button {
+    display: inline-block;
+    background: #5197d1;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+/* Style for the active state using the checkbox hack */
+.hidden-checkbox:checked + #race-ready-button {
+    background: #c82333;
+    box-shadow: 0 0 10px rgba(200, 35, 51, 0.5);
+}
+
+#start-race-button {
+    background: #c82333;
+    color: #FFFFFF;
+    margin-top: 0.75rem;
+}
+
+button[type="submit"] {
+    background: #4CAF50;
+    color: #FFFFFF;
+}
+
+button:hover, .button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #12bb53;
+}
+
+button:active, .button:active {
+    transform: translateY(0);
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+button:disabled {
+    animation: pulse 1.5s infinite;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    button, .button {
+        padding: 0.75rem 1rem;
+    }
+}

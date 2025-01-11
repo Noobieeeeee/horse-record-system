@@ -21,3 +21,20 @@ function deleteRecord(id) {
     }
 }
 
+function showDeleteModal(id) {
+    const modal = document.getElementById("delete-modal");
+    modal.classList.remove("hidden");
+    modal.dataset.recordId = id; // Store the record ID in the modal
+}
+
+function closeModal() {
+    const modal = document.getElementById("delete-modal");
+    modal.classList.add("hidden");
+}
+
+function confirmDelete() {
+    const modal = document.getElementById("delete-modal");
+    const recordId = modal.dataset.recordId;
+    window.location.href = `/delete/${recordId}`;
+}
+

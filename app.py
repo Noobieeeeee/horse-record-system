@@ -2,8 +2,11 @@ import os
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
+from flask import jsonify
 
-app = Flask(__name__)
+# app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
+
 
 # Ensure the 'images' folder exists
 UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'images')
@@ -27,7 +30,7 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS records (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            horse_number TEXT NOT NULL,
+            horse_number TEXT NOT NULL UNIQUE,
             name TEXT NOT NULL,
             address TEXT,
             organization TEXT,
@@ -38,15 +41,17 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Route to display records
 @app.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
-    start = (page - 1) * 8
+    start = (page - 1) * 7  # Display 7 items per page
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM records LIMIT ? OFFSET ?', (7, start))
+    
+    # Order by horse_number numerically and limit to 7 items per page
+    cursor.execute('SELECT * FROM records ORDER BY CAST(horse_number AS INTEGER) ASC LIMIT ? OFFSET ?', (7, start))
     rows = cursor.fetchall()
+    
     cursor.execute('SELECT COUNT(*) FROM records')
     total_records = cursor.fetchone()[0]
     conn.close()
@@ -65,10 +70,11 @@ def index():
         for row in rows
     ]
 
-    total_pages = (total_records // 8) + (1 if total_records % 8 != 0 else 0)
-    return render_template('index.html', records=paginated_records, page=page, total_pages=total_pages)
+    total_pages = (total_records // 7) + (1 if total_records % 7 != 0 else 0)  # Adjusted for 7 items per page
+    total_racers = get_total_racers()  # Get the total number of racers
+    return render_template('index.html', records=paginated_records, page=page, total_pages=total_pages, total_racers=total_racers)
 
-# Route to add a new record
+
 @app.route('/add', methods=['POST'])
 def add_item():
     horse_number = request.form['horse_number']
@@ -87,16 +93,23 @@ def add_item():
             image = image_filename
 
     # Insert record into SQLite database
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO records (horse_number, name, address, organization, age, image)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (horse_number, name, address, organization, age, image))
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        cursor.execute('''        
+            INSERT INTO records (horse_number, name, address, organization, age, image)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (horse_number, name, address, organization, age, image))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('index'))
 
-    return redirect(url_for('index'))
+    except sqlite3.IntegrityError:
+        # Handle the case where horse_number already exists
+        conn.close()
+        error_message = "Error: Horse number already exists!"
+        return render_template('index.html', error_message=error_message)
+
 
 # Route to edit a record
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -151,7 +164,7 @@ def edit_record(id):
     }
     return render_template('edit.html', record=record)
 
-# Route to delete a record
+
 @app.route('/delete/<int:id>', methods=['GET'])
 def delete_record(id):
     conn = sqlite3.connect(DATABASE)
@@ -161,7 +174,7 @@ def delete_record(id):
     conn.close()
     return redirect(url_for('index'))
 
-# Route to show details of a record
+
 @app.route('/details/<int:id>', methods=['GET'])
 def details(id):
     conn = sqlite3.connect(DATABASE)
@@ -184,6 +197,74 @@ def details(id):
         record = None
 
     return render_template('details.html', record=record)
+
+@app.route('/leaderboard')
+def leaderboard():
+    return render_template('leaderboard.html')
+# In app.py, add this new route:
+#honestly have no idea this part works, stay tuned :P
+
+@app.route('/api/leaderboard')
+def get_leaderboard():
+    page = request.args.get('page', 1, type=int)
+    riders_per_page = 10
+    offset = (page - 1) * riders_per_page
+    
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    
+    # Get paginated records
+    cursor.execute('''
+        SELECT id, horse_number, name, address, organization, age, image 
+        FROM records 
+        ORDER BY horse_number ASC 
+        LIMIT ? OFFSET ?
+    ''', (riders_per_page, offset))
+    records = cursor.fetchall()
+    
+    # Get total count for pagination
+    cursor.execute('SELECT COUNT(*) FROM records')
+    total_records = cursor.fetchone()[0]
+    
+    # Convert to dictionary format
+    riders = []
+    for record in records:
+        image_url = url_for('static', filename=f'images/{record[6]}') if record[6] else None
+        riders.append({
+            'id': record[0],
+            'horse_number': record[1],
+            'name': record[2],
+            'address': record[3],
+            'organization': record[4],
+            'age': record[5],
+            'img': image_url
+        })
+    
+    return jsonify({
+        'riders': riders,
+        'total_records': total_records
+    })
+
+@app.route('/race')
+def race():
+    racers = get_all_racers()
+    return render_template('race.html', racers=racers)
+
+def get_all_racers():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, name FROM records ORDER BY horse_number ASC')
+    records = cursor.fetchall()
+    conn.close()
+    return [{'id': record[0], 'name': record[1]} for record in records]
+
+def get_total_racers():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute('SELECT COUNT(*) FROM records')
+    total = cursor.fetchone()[0]
+    conn.close()
+    return total
 
 if __name__ == '__main__':
     init_db()  # Ensure the database and table are created

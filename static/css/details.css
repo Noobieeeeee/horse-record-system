@@ -13,9 +13,10 @@ body {
     color: #fff;
     text-align: center;
     margin: 20px 0;
+    margin-top: 0;
     background-color: #5197d1;
     padding: 15px;
-    border-radius: 10px 10px 0 0;
+    /* border-radius: 10px 10px 0 0; */
 }
 
 /* Details Container */
