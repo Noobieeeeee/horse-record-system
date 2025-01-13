@@ -73,6 +73,13 @@ select:hover, select:focus {
     outline: none;
 }
 
+.back-to-main {
+    /* background: #c82333; */
+    /* color: #FFFFFF;
+    margin-top: 0.75rem; */
+    padding-top: 20px;
+}
+
 button, .button {
     padding: 0.75rem 1.5rem;
     font-size: 0.875rem;
@@ -92,16 +99,22 @@ button, .button {
 }
 
 #race-ready-button {
-    display: inline-block;
     background: #5197d1;
     color: #FFFFFF;
     text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Style for the active state using the checkbox hack */
-.hidden-checkbox:checked + #race-ready-button {
+#race-ready-button.active {
     background: #c82333;
     box-shadow: 0 0 10px rgba(200, 35, 51, 0.5);
+}
+
+/* Keep hover effect only when not active */
+#race-ready-button:not(.active):hover {
+    background: #4080b8;
 }
 
 #start-race-button {

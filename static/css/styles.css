@@ -318,3 +318,102 @@ table td img {
 #race-button:hover {
     background-color: #218838;
 }
+
+#form-popup, #announcement-popup, #title-popup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    margin: 20px;
+}
+
+#open-form-button, #open-announcement-button, #open-title-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+    font-weight: bold;
+}
+
+#open-form-button:hover, #open-announcement-button:hover, #open-title-button:hover {
+    background-color: #45a049;
+}
+
+#cancel-form-button, #cancel-announcement-button, #cancel-title-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#cancel-form-button:hover, #cancel-announcement-button:hover, #cancel-title-button:hover {
+    background-color: #c82333;
+}
+
+textarea {
+    width: 95%;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#form-popup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+#open-form-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#open-form-button:hover {
+    background-color: #45a049;
+}
+
+#cancel-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#cancel-button:hover {
+    background-color: #c82333;
+}

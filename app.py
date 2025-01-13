@@ -38,6 +38,16 @@ def init_db():
             image TEXT
         )
     ''')
+    
+    # Create race_times table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS race_times (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            rider_id INTEGER,
+            time TEXT,
+            FOREIGN KEY (rider_id) REFERENCES records (id)
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -72,7 +82,7 @@ def index():
 
     total_pages = (total_records // 7) + (1 if total_records % 7 != 0 else 0)  # Adjusted for 7 items per page
     total_racers = get_total_racers()  # Get the total number of racers
-    return render_template('index.html', records=paginated_records, page=page, total_pages=total_pages, total_racers=total_racers)
+    return render_template('index.html', records=paginated_records, page=page, total_pages=total_pages, total_racers=total_racers, get_title=get_title, get_announcement=get_announcement)
 
 
 @app.route('/add', methods=['POST'])
@@ -198,52 +208,128 @@ def details(id):
 
     return render_template('details.html', record=record)
 
-@app.route('/leaderboard')
-def leaderboard():
-    return render_template('leaderboard.html')
-# In app.py, add this new route:
-#honestly have no idea this part works, stay tuned :P
+@app.route('/get_final_leaderboard_data')
+def get_final_leaderboard_data():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
 
-@app.route('/api/leaderboard')
-def get_leaderboard():
-    page = request.args.get('page', 1, type=int)
-    riders_per_page = 10
-    offset = (page - 1) * riders_per_page
-    
+    # Fetch top 20 racers ordered by time
+    cursor.execute('''
+        SELECT name, organization, time
+        FROM records
+        ORDER BY 
+            CASE WHEN time IS NULL THEN 1 ELSE 0 END,
+            CAST(time AS FLOAT) ASC
+        LIMIT 20
+    ''')
+    records = cursor.fetchall()
+    conn.close()
+
+    # Prepare leaderboard data
+    leaderboard1 = []
+    leaderboard2 = []
+
+    for i in range(20):
+        if i < len(records):
+            time_formatted = seconds_to_time_format(records[i][2])  # Format the time
+            entry = {
+                'rank': i + 1,
+                'name': records[i][0],
+                'organization': records[i][1],
+                'time': time_formatted if time_formatted else '--:--:--'
+            }
+        else:
+            entry = {
+                'rank': i + 1,
+                'name': '---',
+                'organization': '---',
+                'time': '--:--:--'
+            }
+        
+        # Add to respective leaderboard
+        if i < 10:
+            leaderboard1.append(entry)
+        else:
+            leaderboard2.append(entry)
+    # print(leaderboard1,leaderboard2)
+    return jsonify({'leaderboard1': leaderboard1, 'leaderboard2': leaderboard2})
+
+
+
+@app.route('/leaderboard_v2') # new leaderboard with 20 racers - to be used for final leaderboard
+def leaderboard_v2():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
-    # Get paginated records
+    # Fetch top 20 racers ordered by time
     cursor.execute('''
-        SELECT id, horse_number, name, address, organization, age, image 
-        FROM records 
-        ORDER BY horse_number ASC 
-        LIMIT ? OFFSET ?
-    ''', (riders_per_page, offset))
+        SELECT r.name, r.organization, rt.time 
+        FROM records r
+        LEFT JOIN race_times rt ON r.id = rt.rider_id
+        WHERE rt.time IS NOT NULL
+        ORDER BY rt.time ASC
+        LIMIT 20
+    ''')
     records = cursor.fetchall()
+    conn.close()
     
-    # Get total count for pagination
-    cursor.execute('SELECT COUNT(*) FROM records')
-    total_records = cursor.fetchone()[0]
+    # Prepare data for the template, padding with empty entries if less than 20
+    leaderboard_data = []
+    for i in range(20):
+        if i < len(records):
+            leaderboard_data.append({
+                'rank': i + 1,
+                'name': records[i][0],
+                'organization': records[i][1],
+                'time': records[i][2] if records[i][2] else '--:--:--'
+            })
+        else:
+            leaderboard_data.append({
+                'rank': i + 1,
+                'name': '---',
+                'organization': '---',
+                'time': '--:--:--'
+            })
     
-    # Convert to dictionary format
-    riders = []
-    for record in records:
-        image_url = url_for('static', filename=f'images/{record[6]}') if record[6] else None
-        riders.append({
-            'id': record[0],
-            'horse_number': record[1],
-            'name': record[2],
-            'address': record[3],
-            'organization': record[4],
-            'age': record[5],
-            'img': image_url
-        })
+    return render_template('finalLeaderboard.html', leaderboard_data=leaderboard_data,get_title=get_title, get_announcement=get_announcement)
+
+@app.route('/leaderboard_v1') # old leaderboard with 10 racers
+def leaderboard_v1():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
     
-    return jsonify({
-        'riders': riders,
-        'total_records': total_records
-    })
+    # Fetch top 10 racers ordered by time
+    cursor.execute('''
+        SELECT r.name, r.organization, rt.time 
+        FROM records r
+        LEFT JOIN race_times rt ON r.id = rt.rider_id
+        WHERE rt.time IS NOT NULL
+        ORDER BY rt.time ASC
+        LIMIT 10
+    ''')
+    records = cursor.fetchall()
+    conn.close()
+    
+    # Prepare data for the template, padding with empty entries if less than 10
+    leaderboard_data = []
+    for i in range(10):
+        if i < len(records):
+            leaderboard_data.append({
+                'rank': i + 1,
+                'name': records[i][0],
+                'organization': records[i][1],
+                'time': records[i][2] if records[i][2] else '--:--:--'
+            })
+        else:
+            leaderboard_data.append({
+                'rank': i + 1,
+                'name': '---',
+                'organization': '---',
+                'time': '--:--:--'
+            })
+    # print(leaderboard_data)
+    
+    return render_template('leadboard.html', leaderboard_data=leaderboard_data,get_title=get_title, get_announcement=get_announcement)
 
 @app.route('/race')
 def race():
@@ -265,6 +351,123 @@ def get_total_racers():
     total = cursor.fetchone()[0]
     conn.close()
     return total
+
+def seconds_to_time_format(seconds):
+    """Convert seconds to MM:SS:ms format"""
+    if seconds is None:
+        return '--:--:--'
+    
+    try:
+        seconds = float(seconds)
+        minutes = int(seconds // 60)
+        remaining_seconds = seconds % 60
+        return f"{minutes:02d}:{remaining_seconds:05.2f}"
+    except (ValueError, TypeError):
+        return '--:--:--'
+
+@app.route('/get_leaderboard_data')
+def get_leaderboard_data():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT name, organization, time
+        FROM records
+        ORDER BY 
+            CASE WHEN time IS NULL THEN 1 ELSE 0 END,
+            CAST(time AS FLOAT) ASC
+        LIMIT 10
+    ''')
+    records = cursor.fetchall()
+    conn.close()
+    
+    leaderboard_data = []
+    for i in range(10):
+        if i < len(records):
+            time_formatted = seconds_to_time_format(records[i][2])  # Format the time
+            leaderboard_data.append({
+                'rank': i + 1,
+                'name': records[i][0],
+                'organization': records[i][1],
+                'time': time_formatted
+            })
+        else:
+            leaderboard_data.append({
+                'rank': '--',
+                'name': '---',
+                'organization': '---',
+                'time': '--:--:--'
+            })
+    # print(leaderboard_data)
+    return jsonify(leaderboard_data)
+
+@app.route('/get_racer_details/<int:id>')
+def get_racer_details(id):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT r.*, rt.time 
+        FROM records r
+        LEFT JOIN race_times rt ON r.id = rt.rider_id
+        WHERE r.id = ?
+        ORDER BY rt.id DESC
+        LIMIT 1
+    ''', (id,))
+    
+    row = cursor.fetchone()
+    conn.close()
+    
+    if row:
+        racer_data = {
+            'name': row[2],
+            'age': row[5],
+            'organization': row[4],
+            'address': row[3],
+            'image': url_for('static', filename=f'images/{row[6]}') if row[6] else url_for('static', filename='images/collectors/stock.png'),
+            'time': seconds_to_time_format(row[7])
+        }
+        return jsonify(racer_data)
+    
+    return jsonify({'error': 'Racer not found'}), 404
+
+@app.route('/announcement', methods=['POST'])
+def update_announcement():
+    new_announcement = request.form['announcement']
+    # Save the new announcement to a file or database
+    with open('announcement.txt', 'w') as f:
+        f.write(new_announcement)
+    return redirect(url_for('index'))
+
+@app.route('/title', methods=['POST'])
+def update_title():
+    new_title = request.form['title']
+    # Save the new title to a file or database
+    with open('title.txt', 'w') as f:
+        f.write(new_title)
+    return redirect(url_for('index'))
+
+def get_announcement():
+    try:
+        with open('announcement.txt', 'r') as f:
+            return f.read()
+    except FileNotFoundError:
+        return "Horse Racing Championship 2025 will be held in Manolo Fortich, Bukidnon; This is a sample announcement"
+
+def get_title():
+    try:
+        with open('title.txt', 'r') as f:
+            return f.read()
+    except FileNotFoundError:
+        return "IMPASUGONG HORSE RACING ASSOCIATION"
+    
+@app.route('/get_title')
+def get_title_route():
+    return jsonify({'title': get_title()})
+
+@app.route('/get_announcement')
+def get_announcement_route():
+    return jsonify({'announcement': get_announcement()})
 
 if __name__ == '__main__':
     init_db()  # Ensure the database and table are created

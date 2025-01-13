@@ -18,28 +18,52 @@
         {% endif %}
         <!-- Left Column: Add New Record Form -->
         <div class="form-column">
-            <h2>Add New Record</h2>
-            <form action="/add" method="POST" enctype="multipart/form-data">
-                <label for="horse_number">Horse Number:</label>
-                <input type="number" id="horse_number" name="horse_number" required min="1" step="1">
+            <h2 style="text-align: center;">Management</h2>
+            <button id="open-form-button">Add Record</button>
+            <button id="open-announcement-button">Announcement</button>
+            <button id="open-title-button">Title</button>
+            <div id="form-popup" class="form-popup" style="display: none;">
+                <form action="/add" method="POST" enctype="multipart/form-data">
+                    <label for="horse_number">Horse Number:</label>
+                    <input type="number" id="horse_number" name="horse_number" required min="1" step="1">
 
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
 
-                <label for="address">Address:</label>
-                <input type="text" id="address" name="address" required>
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" required>
 
-                <label for="organization">Organization:</label>
-                <input type="text" id="organization" name="organization" required>
+                    <label for="organization">Organization:</label>
+                    <input type="text" id="organization" name="organization" required>
 
-                <label for="age">Age:</label>
-                <input type="number" id="age" name="age" required min="1" step="1">
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" required min="1" step="1">
 
-                <label for="image">Upload Image:</label>
-                <input type="file" id="image" name="image" accept="image/*">
+                    <label for="image">Upload Image:</label>
+                    <input type="file" id="image" name="image" accept="image/*">
 
-                <button type="submit">Add Record</button>
-            </form>
+                    <button type="submit">Add Record</button>
+                    <button type="button" id="cancel-form-button">Cancel</button>
+                </form>
+            </div>
+            
+            <div id="announcement-popup" class="form-popup" style="display: none;">
+                <form action="/announcement" method="POST">
+                    <label for="announcement">New Announcement:</label>
+                    <textarea id="announcement" name="announcement" required></textarea>
+                    <button type="submit">Save</button>
+                    <button type="button" id="cancel-announcement-button">Cancel</button>
+                </form>
+            </div>
+            
+            <div id="title-popup" class="form-popup" style="display: none;">
+                <form action="/title" method="POST">
+                    <label for="title">New Event Title:</label>
+                    <input type="text" id="title" name="title" required>
+                    <button type="submit">Save</button>
+                    <button type="button" id="cancel-title-button">Cancel</button>
+                </form>
+            </div>
         </div>
 
         <!-- Right Column: Display Records in a Table -->
@@ -47,7 +71,7 @@
             <div class="header-table">
                 <h2>Horse Records Table</h2>
                 <div class="button-container">
-                    <a id="leaderboard-button" href="{{ url_for('leaderboard') }}" target="_blank" class="button">
+                    <a id="leaderboard-button" href="{{ url_for('leaderboard_v2') }}" target="_blank" class="button">
                         <i class="fas fa-trophy"></i> 
                         View Leaderboard
                     </a>
@@ -118,5 +142,27 @@
             
         </div>
     </div>
+    <script>
+        document.getElementById('open-form-button').addEventListener('click', function() {
+            document.getElementById('form-popup').style.display = 'block';
+        });
+        document.getElementById('cancel-form-button').addEventListener('click', function() {
+            document.getElementById('form-popup').style.display = 'none';
+        });
+        
+        document.getElementById('open-announcement-button').addEventListener('click', function() {
+            document.getElementById('announcement-popup').style.display = 'block';
+        });
+        document.getElementById('cancel-announcement-button').addEventListener('click', function() {
+            document.getElementById('announcement-popup').style.display = 'none';
+        });
+        
+        document.getElementById('open-title-button').addEventListener('click', function() {
+            document.getElementById('title-popup').style.display = 'block';
+        });
+        document.getElementById('cancel-title-button').addEventListener('click', function() {
+            document.getElementById('title-popup').style.display = 'none';
+        });
+    </script>
 </body>
 </html>

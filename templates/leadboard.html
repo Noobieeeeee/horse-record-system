@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/static/css/globals.css" />
+    <link rel="stylesheet" href="/static/css/style_leaderboard.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      // Add this helper function at the top of your script
+      function formatTime(timeString) {
+        if (timeString === '--:--:--' || !timeString) return '--:--:--';
+        return timeString; // Time is now formatted on the server side
+      }
+
+      // Function to update the leaderboard table
+      function updateLeaderboard() {
+        $.ajax({
+          url: '/get_leaderboard_data',
+          method: 'GET',
+          success: function(data) {
+            var tbody = document.querySelector('.leaderboard-table tbody');
+            tbody.innerHTML = '';
+            
+            data.forEach(function(entry) {
+              var row = `
+                <tr>
+                  <td>${entry.rank}</td>
+                  <td>${entry.name}</td>
+                  <td>${entry.organization}</td>
+                  <td>${formatTime(entry.time)}</td>
+                </tr>
+              `;
+              tbody.innerHTML += row;
+            });
+          },
+          error: function(xhr, status, error) {
+            console.error('Error fetching leaderboard data:', error);
+          }
+        });
+      }
+
+      // Function to update current racer details
+      function updateCurrentRacer(data) {
+        // Update racer image
+        $('.racer-image img').attr('src', data.image || '/static/images/stock.png');
+        
+        // Update racer info
+        $('.racer-info .name').text(`Name: ${data.name || '---'}`);
+        $('.racer-info .age').text(`Age: ${data.age || '---'}`);
+        $('.racer-info .organization').text(`Organization: ${data.organization || '---'}`);
+        $('.racer-info .address').text(`Address: ${data.address || '---'}`);
+        
+        // Update timer
+        $('.time-value').text(data.time || '--:--:--');
+      }
+
+      // Function to reset current racer details
+      function resetCurrentRacer() {
+        updateCurrentRacer({
+          image: "/static/images/collectors/stock.png",
+          name: '---',
+          age: '---',
+          organization: '---',
+          address: '---',
+          time: '--:--:--'
+        });
+      }
+
+            // Function to fetch and update the title
+      function updateTitle() {
+        $.ajax({
+          url: '/get_title',
+          method: 'GET',
+          success: function (data) {
+            document.querySelector('.text-wrapper-36').textContent = data.title;
+          },
+          error: function (xhr, status, error) {
+            console.error('Error fetching title:', error);
+          },
+        });
+      }
+
+        // Update leaderboard when page loads and every 3 seconds after
+        document.addEventListener('DOMContentLoaded', function() {
+        updateLeaderboard();
+        setInterval(updateLeaderboard, 3000);
+        setInterval(updateTitle, 3000);
+        setInterval(updateAnnouncement, 20000);
+      });
+
+      // Function to fetch and update the announcement
+      function updateAnnouncement() {
+        $.ajax({
+          url: '/get_announcement',
+          method: 'GET',
+          success: function (data) {
+            document.querySelector('.announcement-text').textContent = data.announcement;
+          },
+          error: function (xhr, status, error) {
+            console.error('Error fetching announcement:', error);
+          },
+        });
+      }
+
+      // document.addEventListener('scroll', function () {
+      //   updateAnnouncement();
+      // });
+
+    </script>
+  </head>
+  <body>
+    <div class="frame">
+      <div class="div">
+        <!-- Header -->
+        <div class="div-wrapper">
+          <div class="text-wrapper-36">{{ get_title() }}</div>
+        </div>
+        
+        <!-- Main content area -->
+        <div class="main-content">
+          <!-- Current racer section -->
+          <div class="current-racer-wrapper">
+            <div class="current-racer">
+              <div class="racer-content">
+                <div class="racer-image">
+                  <img class="image" src="" />
+                </div>
+                
+                <div class="timer-section">
+                  <div class="timer-label">Time</div>
+                  <div class="timer-display">
+                    <div class="time-value">--:--:--</div>
+                  </div>
+                </div>
+
+                <div class="racer-info">
+                  <div class="info-group">
+                    <div class="text-wrapper name">Name: ---</div>
+                    <div class="text-wrapper-2 age">Age: ---</div>
+                    <div class="text-wrapper-3 organization">Organization: ---</div>
+                    <div class="text-wrapper-4 address">Address: ---</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leaderboard section -->
+          <div class="leaderboard-wrapper">
+            <div class="leaderboard">
+              <table class="leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>RANK</th>
+                    <th>NAME</th>
+                    <th>ORGANIZATION</th>
+                    <th>TIME</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Table body will be populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Announcement -->
+        <div class="announcement">
+          <div class="announcement-content">
+            <div class="text-wrapper-35">ANNOUNCEMENT</div>
+            <div class="announcement-text">{{ get_announcement() }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
