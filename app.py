@@ -369,11 +369,17 @@ def seconds_to_time_format(seconds):
 def get_leaderboard_data():
     page = request.args.get('page', 1, type=int)
     items_per_page = request.args.get('items_per_page', 10, type=int)
+    
+    # Ensure items_per_page is a multiple of 10
+    if items_per_page % 10 != 0:
+        items_per_page = (items_per_page // 10 + 1) * 10  # Round up to the nearest multiple of 10
+    
     start = (page - 1) * items_per_page
 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
+    # Fetch paginated records
     cursor.execute('''
         SELECT name, organization, time
         FROM records
@@ -384,10 +390,12 @@ def get_leaderboard_data():
     ''', (items_per_page, start))
     records = cursor.fetchall()
     
+    # Fetch total number of records
     cursor.execute('SELECT COUNT(*) FROM records')
     total_items = cursor.fetchone()[0]
     conn.close()
     
+    # Format leaderboard data
     leaderboard_data = []
     for i, record in enumerate(records, start=start + 1):
         time_formatted = seconds_to_time_format(record[2])  # Format the time
@@ -396,6 +404,15 @@ def get_leaderboard_data():
             'name': record[0],
             'organization': record[1],
             'time': time_formatted
+        })
+    
+    # Pad the leaderboard_data with placeholder entries if there are fewer than items_per_page records
+    while len(leaderboard_data) < items_per_page:
+        leaderboard_data.append({
+            'rank': len(leaderboard_data) + 1 + start,
+            'name': '---',
+            'organization': '---',
+            'time': '--:--:--'
         })
     
     return jsonify({'items': leaderboard_data, 'totalItems': total_items})
