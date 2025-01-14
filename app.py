@@ -367,6 +367,10 @@ def seconds_to_time_format(seconds):
 
 @app.route('/get_leaderboard_data')
 def get_leaderboard_data():
+    page = request.args.get('page', 1, type=int)
+    items_per_page = request.args.get('items_per_page', 10, type=int)
+    start = (page - 1) * items_per_page
+
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
@@ -376,30 +380,26 @@ def get_leaderboard_data():
         ORDER BY 
             CASE WHEN time IS NULL THEN 1 ELSE 0 END,
             CAST(time AS FLOAT) ASC
-        LIMIT 10
-    ''')
+        LIMIT ? OFFSET ?
+    ''', (items_per_page, start))
     records = cursor.fetchall()
+    
+    cursor.execute('SELECT COUNT(*) FROM records')
+    total_items = cursor.fetchone()[0]
     conn.close()
     
     leaderboard_data = []
-    for i in range(10):
-        if i < len(records):
-            time_formatted = seconds_to_time_format(records[i][2])  # Format the time
-            leaderboard_data.append({
-                'rank': i + 1,
-                'name': records[i][0],
-                'organization': records[i][1],
-                'time': time_formatted
-            })
-        else:
-            leaderboard_data.append({
-                'rank': '--',
-                'name': '---',
-                'organization': '---',
-                'time': '--:--:--'
-            })
-    # print(leaderboard_data)
-    return jsonify(leaderboard_data)
+    for i, record in enumerate(records, start=start + 1):
+        time_formatted = seconds_to_time_format(record[2])  # Format the time
+        leaderboard_data.append({
+            'rank': i,
+            'name': record[0],
+            'organization': record[1],
+            'time': time_formatted
+        })
+    
+    return jsonify({'items': leaderboard_data, 'totalItems': total_items})
+    
 
 @app.route('/get_racer_details/<int:id>')
 def get_racer_details(id):
@@ -452,14 +452,14 @@ def get_announcement():
         with open('announcement.txt', 'r') as f:
             return f.read()
     except FileNotFoundError:
-        return "Horse Racing Championship 2025 will be held in Manolo Fortich, Bukidnon; This is a sample announcement"
+        return "This is a sample announcement"
 
 def get_title():
     try:
         with open('title.txt', 'r') as f:
             return f.read()
     except FileNotFoundError:
-        return "IMPASUGONG HORSE RACING ASSOCIATION"
+        return "HORSE RACING ASSOCIATION"
     
 @app.route('/get_title')
 def get_title_route():

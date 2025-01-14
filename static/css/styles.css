@@ -185,17 +185,22 @@ table td img {
     transition: background-color 0.3s ease;
 }
 
-#leaderboard-button {
-    background-color: #5197d1;
+#leaderboard-button{
+    background-color: #4CAF50;
+    color: white;
     border: none;
+    padding: 12px 20px;
     cursor: pointer;
-    display:block;
-    align-items: center; /* Aligns the icon and the text */
-    gap: 10px; /* Adds space between icon and text */
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+    font-weight: bold;
 }
 
-#leaderboard-button:hover {
-    background-color: #0857aa;
+#leaderboard-button:hover, #race-button:hover {
+    background-color: #45a049;
 }
 
 .details-button {
@@ -285,38 +290,12 @@ table td img {
     text-align: left;
 }
 
-.button-container {
-    display: flex;
-    width: 100%;
-    gap: 10px;
-}
-
-.button-container .button, .button-container button {
-    flex: 1;
-    text-align: center;
-    padding: 10px;
-    margin: 0;
-    border: none;
-    cursor: pointer;
-    color: white;
-    font-size: 16px;
-    border-radius: 5px;
-}
-
-#leaderboard-button {
-    background-color: #5197d1;
-}
-
-#leaderboard-button:hover {
-    background-color: #0857aa;
-}
-
 #race-button {
-    background-color: #28a745;
+    background-color: #4CAF50;
 }
 
 #race-button:hover {
-    background-color: #218838;
+    background-color: #45a049;
 }
 
 #form-popup, #announcement-popup, #title-popup {
@@ -333,7 +312,7 @@ table td img {
     margin: 20px;
 }
 
-#open-form-button, #open-announcement-button, #open-title-button {
+#open-form-button, #open-announcement-button, #open-title-button #leaderboard-button {
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -386,6 +365,17 @@ textarea {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+}
+
+#backdrop-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .7); /* Semi-transparent black */
+    z-index: 999; /* Below the popup */
 }
 
 #open-form-button {

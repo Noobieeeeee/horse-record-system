@@ -19,9 +19,26 @@
         <!-- Left Column: Add New Record Form -->
         <div class="form-column">
             <h2 style="text-align: center;">Management</h2>
-            <button id="open-form-button">Add Record</button>
-            <button id="open-announcement-button">Announcement</button>
-            <button id="open-title-button">Title</button>
+            <div class="button-container">
+                <button id="open-form-button">Add Record</button>
+                <button id="open-announcement-button">Announcement</button>
+                <button id="open-title-button">Title</button>
+                
+                <button id="leaderboard-button" class="button">
+                    <i class="fas fa-trophy"></i> 
+                    View Leaderboard
+                </button>
+
+                <form action="{{ url_for('race') }}" method="get" style="flex: 1;">
+                    <button id="race-button" type="submit" class="button">
+                        <i class="fas fa-flag-checkered"></i> 
+                        Race
+                    </button>
+                </form>
+            </div>
+
+            <div id="backdrop-overlay"></div>
+            
             <div id="form-popup" class="form-popup" style="display: none;">
                 <form action="/add" method="POST" enctype="multipart/form-data">
                     <label for="horse_number">Horse Number:</label>
@@ -70,18 +87,6 @@
         <div class="table-column">
             <div class="header-table">
                 <h2>Horse Records Table</h2>
-                <div class="button-container">
-                    <a id="leaderboard-button" href="{{ url_for('leaderboard_v2') }}" target="_blank" class="button">
-                        <i class="fas fa-trophy"></i> 
-                        View Leaderboard
-                    </a>
-                    <form action="{{ url_for('race') }}" method="get" style="flex: 1;">
-                        <button id="race-button" type="submit" class="button">
-                            <i class="fas fa-flag-checkered"></i> 
-                            Race
-                        </button>
-                    </form>
-                </div>
             </div>
             
             <table>
@@ -145,23 +150,40 @@
     <script>
         document.getElementById('open-form-button').addEventListener('click', function() {
             document.getElementById('form-popup').style.display = 'block';
+            document.getElementById('backdrop-overlay').style.display = 'block';
         });
         document.getElementById('cancel-form-button').addEventListener('click', function() {
             document.getElementById('form-popup').style.display = 'none';
+            document.getElementById('backdrop-overlay').style.display = 'none';
         });
         
         document.getElementById('open-announcement-button').addEventListener('click', function() {
             document.getElementById('announcement-popup').style.display = 'block';
+            document.getElementById('backdrop-overlay').style.display = 'block';
         });
         document.getElementById('cancel-announcement-button').addEventListener('click', function() {
             document.getElementById('announcement-popup').style.display = 'none';
+            document.getElementById('backdrop-overlay').style.display = 'none';
         });
         
         document.getElementById('open-title-button').addEventListener('click', function() {
             document.getElementById('title-popup').style.display = 'block';
+            document.getElementById('backdrop-overlay').style.display = 'block';
         });
         document.getElementById('cancel-title-button').addEventListener('click', function() {
             document.getElementById('title-popup').style.display = 'none';
+            document.getElementById('backdrop-overlay').style.display = 'none';
+        });
+
+        document.getElementById('leaderboard-button').addEventListener('click', function(event) {
+            event.preventDefault(); 
+            console.log('View Leaderboard button clicked');
+            const leaderboardUrl = "{{ url_for('leaderboard_v2') }}"; 
+            window.open(leaderboardUrl, '_blank'); 
+        });
+        document.getElementById('backdrop-overlay').addEventListener('click', function() {
+            document.getElementById('form-popup').style.display = 'none';
+            this.style.display = 'none';
         });
     </script>
 </body>
