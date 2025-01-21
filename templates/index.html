@@ -6,6 +6,7 @@
     <title>Horse Records</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <h1>Horse Records</h1>
@@ -25,16 +26,27 @@
                 <button id="open-title-button">Title</button>
                 
                 <button id="leaderboard-button" class="button">
-                    <!-- <i class="fas fa-trophy"></i>  -->
                     View Leaderboard
                 </button>
 
-                <form action="{{ url_for('race') }}" method="get" style="flex: 1;">
-                    <button id="race-button" type="submit" class="button">
-                        <!-- <i class="fas fa-flag-checkered"></i>  -->
-                        Controllers
-                    </button>
-                </form>
+                <!-- Race Controls -->
+                <div class="race-controls">
+                    <label for="racers">Select Racer:</label>
+                    <select id="racers" name="racers">
+                        {% for racer in racers %}
+                        <option value="{{ racer.id }}">{{ racer.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="checkbox" id="race-ready-toggle" class="hidden-checkbox">
+                    <label for="race-ready-toggle" class="button" id="race-ready-button">Race Ready</label>
+                    <button type="button" id="start-race-button">Start Race</button>
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="pagination">
+                    <button id="prev-page" disabled>Previous</button>
+                    <button id="next-page">Next</button>
+                </div>
             </div>
 
             <div id="backdrop-overlay"></div>
@@ -127,7 +139,6 @@
             </table>
 
             <div class="pagination">
-
                 <div class="pagination-info">
                     <span>Total Racers: {{ total_racers }}</span>
                 </div>
@@ -142,48 +153,147 @@
                     <a href="{{ url_for('index', page=page+1) }}">Next</a>
                 {% endif %}
             </div>
-            
-
-            
         </div>
     </div>
-    <script>
-        document.getElementById('open-form-button').addEventListener('click', function() {
-            document.getElementById('form-popup').style.display = 'block';
-            document.getElementById('backdrop-overlay').style.display = 'block';
-        });
-        document.getElementById('cancel-form-button').addEventListener('click', function() {
-            document.getElementById('form-popup').style.display = 'none';
-            document.getElementById('backdrop-overlay').style.display = 'none';
-        });
-        
-        document.getElementById('open-announcement-button').addEventListener('click', function() {
-            document.getElementById('announcement-popup').style.display = 'block';
-            document.getElementById('backdrop-overlay').style.display = 'block';
-        });
-        document.getElementById('cancel-announcement-button').addEventListener('click', function() {
-            document.getElementById('announcement-popup').style.display = 'none';
-            document.getElementById('backdrop-overlay').style.display = 'none';
-        });
-        
-        document.getElementById('open-title-button').addEventListener('click', function() {
-            document.getElementById('title-popup').style.display = 'block';
-            document.getElementById('backdrop-overlay').style.display = 'block';
-        });
-        document.getElementById('cancel-title-button').addEventListener('click', function() {
-            document.getElementById('title-popup').style.display = 'none';
-            document.getElementById('backdrop-overlay').style.display = 'none';
-        });
 
-        document.getElementById('leaderboard-button').addEventListener('click', function(event) {
-            event.preventDefault(); 
-            console.log('View Leaderboard button clicked');
-            const leaderboardUrl = "{{ url_for('leaderboard_v2') }}"; 
-            window.open(leaderboardUrl, '_blank'); 
-        });
-        document.getElementById('backdrop-overlay').addEventListener('click', function() {
-            document.getElementById('form-popup').style.display = 'none';
-            this.style.display = 'none';
+    <script>
+        $(document).ready(function() {
+            let isRaceReady = false;
+            let leaderboardWindow = null;
+            
+            // Function to check if leaderboard window exists and is open
+            function getLeaderboardWindow() {
+                if (!leaderboardWindow || leaderboardWindow.closed) {
+                    leaderboardWindow = window.open("{{ url_for('leaderboard_v1') }}", "leaderboard", "width=800,height=600");
+                }
+                return leaderboardWindow;
+            }
+            
+            $('#race-ready-toggle').change(function() {
+                const selectedRacerId = $('#racers').val();
+                isRaceReady = $(this).prop('checked');
+                
+                let lbWindow = getLeaderboardWindow();
+                
+                if (lbWindow) {
+                    if (isRaceReady) {
+                        // Update with selected racer details
+                        $.get(`/get_racer_details/${selectedRacerId}`, function(data) {
+                            lbWindow.updateCurrentRacer(data);
+                            $('#race-ready-button').addClass('active');
+                        });
+                    } else {
+                        // Reset to default state
+                        lbWindow.resetCurrentRacer();
+                        $('#race-ready-button').removeClass('active');
+                    }
+                    lbWindow.focus(); // Bring leaderboard window to front
+                }
+            });
+
+            let currentPage = 1;
+            const itemsPerPage = 10;
+
+            function updatePaginationControls(totalItems) {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                $('#prev-page').prop('disabled', currentPage === 1);
+                $('#next-page').prop('disabled', currentPage === totalPages);
+            }
+
+            function fetchLeaderboardPage(page) {
+                $.ajax({
+                    url: `/get_leaderboard_data?page=${page}&items_per_page=${itemsPerPage}`,
+                    method: 'GET',
+                    success: function(data) {
+                        let lbWindow = getLeaderboardWindow();
+                        if (lbWindow) {
+                            const tbody = lbWindow.document.querySelector('.leaderboard-table tbody');
+                            tbody.innerHTML = '';
+                            data.items.forEach(function(entry) {
+                                const row = `
+                                    <tr>
+                                        <td>${entry.rank}</td>
+                                        <td>${entry.name}</td>
+                                        <td>${entry.organization}</td>
+                                        <td>${entry.time}</td>
+                                    </tr>
+                                `;
+                                tbody.innerHTML += row;
+                            });
+                            updatePaginationControls(data.totalItems);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching leaderboard data:', error);
+                    }
+                });
+            }
+
+            $('#prev-page').click(function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    fetchLeaderboardPage(currentPage);
+                }
+            });
+
+            $('#next-page').click(function() {
+                currentPage++;
+                fetchLeaderboardPage(currentPage);
+            });
+
+            // Initial fetch
+            fetchLeaderboardPage(currentPage);
+
+            // Pop-up event listeners
+            document.getElementById('open-form-button').addEventListener('click', function() {
+                console.log('Open Form Button Clicked'); // Debugging
+                document.getElementById('form-popup').style.display = 'block';
+                document.getElementById('backdrop-overlay').style.display = 'block';
+            });
+
+            document.getElementById('cancel-form-button').addEventListener('click', function() {
+                console.log('Cancel Form Button Clicked'); // Debugging
+                document.getElementById('form-popup').style.display = 'none';
+                document.getElementById('backdrop-overlay').style.display = 'none';
+            });
+
+            document.getElementById('open-announcement-button').addEventListener('click', function() {
+                console.log('Open Announcement Button Clicked'); // Debugging
+                document.getElementById('announcement-popup').style.display = 'block';
+                document.getElementById('backdrop-overlay').style.display = 'block';
+            });
+
+            document.getElementById('cancel-announcement-button').addEventListener('click', function() {
+                console.log('Cancel Announcement Button Clicked'); // Debugging
+                document.getElementById('announcement-popup').style.display = 'none';
+                document.getElementById('backdrop-overlay').style.display = 'none';
+            });
+
+            document.getElementById('open-title-button').addEventListener('click', function() {
+                console.log('Open Title Button Clicked'); // Debugging
+                document.getElementById('title-popup').style.display = 'block';
+                document.getElementById('backdrop-overlay').style.display = 'block';
+            });
+
+            document.getElementById('cancel-title-button').addEventListener('click', function() {
+                console.log('Cancel Title Button Clicked'); // Debugging
+                document.getElementById('title-popup').style.display = 'none';
+                document.getElementById('backdrop-overlay').style.display = 'none';
+            });
+
+            document.getElementById('backdrop-overlay').addEventListener('click', function() {
+                console.log('Backdrop Overlay Clicked'); // Debugging
+                document.getElementById('form-popup').style.display = 'none';
+                document.getElementById('announcement-popup').style.display = 'none';
+                document.getElementById('title-popup').style.display = 'none';
+                this.style.display = 'none';
+            });
+
+            document.getElementById('leaderboard-button').addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default button behavior
+                const leaderboardUrl = "{{ url_for('leaderboard_v2') }}"; // Get the leaderboard URL
+                window.open(leaderboardUrl, '_blank'); // Open the leaderboard in a new tab
+            });
         });
     </script>
 </body>
