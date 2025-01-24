@@ -16,3 +16,9 @@ to do:
 urgent:
     fix the checking for the number - needs to be revised
     add event handler for race - current racing 
+
+
+login page  
+decimal
+front controls
+

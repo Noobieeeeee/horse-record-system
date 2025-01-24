@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Horse Records</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -93,6 +94,34 @@
                     <button type="button" id="cancel-title-button">Cancel</button>
                 </form>
             </div>
+
+            
+            <div class="button-container">
+                <button id="settings-button">Settings</button>
+                <form id="logout-form" action="{{ url_for('logout') }}" method="POST" style="display: inline;">
+                    <button type="submit">Logout</button>
+                </form>
+            </div>
+
+            <div id="settings-popup" class="form-popup" style="display: none;">
+                <form id="settings-form" action="{{ url_for('update_settings') }}" method="POST">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="{{ session['username'] }}" required>
+                    
+                    <label for="current-password">Current Password:</label>
+                    <input type="password" id="current-password" name="current_password" required>
+                    
+                    <label for="new-password">New Password:</label>
+                    <input type="password" id="new-password" name="new_password">
+                    
+                    <label for="confirm-password">Confirm New Password:</label>
+                    <input type="password" id="confirm-password" name="confirm_password">
+                    
+                    <button type="submit">Save</button>
+                    <button type="button" id="cancel-settings-button">Cancel</button>
+                </form>
+                <div id="settings-error" class="error-message" style="display: none;"></div>
+            </div>
         </div>
 
         <!-- Right Column: Display Records in a Table -->
@@ -153,6 +182,7 @@
                     <a href="{{ url_for('index', page=page+1) }}">Next</a>
                 {% endif %}
             </div>
+
         </div>
     </div>
 
@@ -251,6 +281,12 @@
                 document.getElementById('backdrop-overlay').style.display = 'block';
             });
 
+            // document.getElementById('settings-button').addEventListener('click', function() {
+            //     console.log('Settings Button Clicked'); // Debugging
+            //     document.getElementById('form-popup').style.display = 'block';
+            //     document.getElementById('backdrop-overlay').style.display = 'block';
+            // });
+
             document.getElementById('cancel-form-button').addEventListener('click', function() {
                 console.log('Cancel Form Button Clicked'); // Debugging
                 document.getElementById('form-popup').style.display = 'none';
@@ -293,6 +329,35 @@
                 event.preventDefault(); // Prevent default button behavior
                 const leaderboardUrl = "{{ url_for('leaderboard_v2') }}"; // Get the leaderboard URL
                 window.open(leaderboardUrl, '_blank'); // Open the leaderboard in a new tab
+            });
+
+            document.getElementById('settings-button').addEventListener('click', function() {
+                document.getElementById('settings-popup').style.display = 'block';
+                document.getElementById('backdrop-overlay').style.display = 'block';
+            });
+
+            document.getElementById('cancel-settings-button').addEventListener('click', function() {
+                document.getElementById('settings-popup').style.display = 'none';
+                document.getElementById('backdrop-overlay').style.display = 'none';
+            });
+
+            document.getElementById('backdrop-overlay').addEventListener('click', function() {
+                document.getElementById('settings-popup').style.display = 'none';
+                this.style.display = 'none';
+            });
+
+            document.getElementById('settings-form').addEventListener('submit', function(event) {
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                const errorDiv = document.getElementById('settings-error');
+
+                if (newPassword && newPassword !== confirmPassword) {
+                    event.preventDefault();
+                    errorDiv.textContent = 'Passwords do not match';
+                    errorDiv.style.display = 'block';
+                } else {
+                    errorDiv.style.display = 'none';
+                }
             });
         });
     </script>

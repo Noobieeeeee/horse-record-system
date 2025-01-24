@@ -1,11 +1,19 @@
 import os
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from werkzeug.utils import secure_filename
-from flask import jsonify
+from flask_socketio import SocketIO
+import serial
+import threading
+import time
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # app = Flask(__name__)
 app = Flask(__name__, static_folder='static')
+app.secret_key = '5f4dcc3b5aa765d61d8327deb882cf99b8b7f7e8e8b9b7f7'  # Replace with your actual secret key
+socketio = SocketIO(app)
+
+current_time = "--:--:--"
 
 
 # Ensure the 'images' folder exists
@@ -24,7 +32,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 def init_db():
-    """Initialize the SQLite database with the required table."""
+    """Initialize the SQLite database with the required tables."""
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute('''
@@ -39,7 +47,6 @@ def init_db():
         )
     ''')
     
-    # Create race_times table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS race_times (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,11 +55,133 @@ def init_db():
             FOREIGN KEY (rider_id) REFERENCES records (id)
         )
     ''')
+    
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        )
+    ''')
     conn.commit()
     conn.close()
 
+# routing reader here
+# Function to read UART data and send it to the web clients via SocketIO
+
+#commented here xyxyxyx
+# def read_uart():
+#     global current_time
+#     # Configure the serial connection
+#     ser = serial.Serial(
+#         port='/dev/serial0',  # Serial port (UART) on Raspberry Pi
+#         baudrate=115200,      # Baud rate (must match ESP32)
+#         parity=serial.PARITY_NONE,
+#         stopbits=serial.STOPBITS_ONE,
+#         bytesize=serial.EIGHTBITS,
+#         timeout=1
+#     )
+
+#     print("Waiting for data from ESP32...")
+
+#     try:
+#         while True:
+#             if ser.in_waiting > 0:  # Check if data is available
+#                 data = ser.readline().decode('utf-8').strip()  # Read and decode the data
+#                 current_time = data  # Store the received data
+#                 print(f"Received elapsed time: {current_time} seconds")
+#                 # Emit the time to all connected clients
+#                 socketio.emit('update_time', {'time': current_time})
+#     except KeyboardInterrupt:
+#         print("Program terminated.")
+#     except serial.SerialException as e:
+#         print(f"Serial error: {e}")
+#     finally:
+#         ser.close()  # Close the serial connection when done
+
+
+@socketio.on('connect')
+def handle_connect():
+    print("Client connected")
+    # Emit the latest time immediately after connection
+    socketio.emit('update_time', {'time': current_time})
+
+# Start UART reading in a separate thread
+
+# uart_thread = threading.Thread(target=read_uart)
+# uart_thread.daemon = True
+# uart_thread.start()
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+        user = cursor.fetchone()
+        conn.close()
+        
+        if user and check_password_hash(user[2], password):
+            session['user_id'] = user[0]
+            session['username'] = user[1]
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid username or password')
+    
+    return render_template('login.html')
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    session.pop('username', None)
+    flash('You have been logged out', 'success')
+    return redirect(url_for('login'))
+
+@app.route('/update_settings', methods=['POST'])
+def update_settings():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    new_username = request.form['username']
+    current_password = request.form['current_password']
+    new_password = request.form['new_password']
+    confirm_password = request.form['confirm_password']
+    
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute('SELECT password FROM users WHERE id = ?', (session['user_id'],))
+    user = cursor.fetchone()
+    
+    if not user or not check_password_hash(user[0], current_password):
+        flash('Current password is incorrect', 'error')
+        conn.close()
+        return redirect(url_for('index'))
+    
+    if new_password:
+        if new_password != confirm_password:
+            flash('New passwords do not match', 'error')
+            conn.close()
+            return redirect(url_for('index'))
+        new_password_hash = generate_password_hash(new_password)
+        cursor.execute('UPDATE users SET username = ?, password = ? WHERE id = ?', (new_username, new_password_hash, session['user_id']))
+    else:
+        cursor.execute('UPDATE users SET username = ? WHERE id = ?', (new_username, session['user_id']))
+    
+    conn.commit()
+    conn.close()
+    
+    session['username'] = new_username
+    flash('Settings updated successfully', 'success')
+    return redirect(url_for('index'))
+
 @app.route('/')
 def index():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * 7  # Display 7 items per page
     conn = sqlite3.connect(DATABASE)
@@ -82,11 +211,14 @@ def index():
 
     total_pages = (total_records // 7) + (1 if total_records % 7 != 0 else 0)  # Adjusted for 7 items per page
     total_racers = get_total_racers()  # Get the total number of racers
-    return render_template('index.html', records=paginated_records, page=page, total_pages=total_pages, total_racers=total_racers, get_title=get_title, get_announcement=get_announcement)
-
+    racers = get_all_racers()  # Get all racers for the race controls
+    return render_template('index.html', records=paginated_records, page=page, total_pages=total_pages, total_racers=total_racers, racers=racers, get_title=get_title, get_announcement=get_announcement)
 
 @app.route('/add', methods=['POST'])
 def add_item():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     horse_number = request.form['horse_number']
     name = request.form['name']
     address = request.form['address']
@@ -124,6 +256,9 @@ def add_item():
 # Route to edit a record
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_record(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     if request.method == 'POST':
@@ -177,6 +312,9 @@ def edit_record(id):
 
 @app.route('/delete/<int:id>', methods=['GET'])
 def delete_record(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute('DELETE FROM records WHERE id = ?', (id,))
@@ -187,6 +325,9 @@ def delete_record(id):
 
 @app.route('/details/<int:id>', methods=['GET'])
 def details(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM records WHERE id = ?', (id,))
@@ -333,6 +474,9 @@ def leaderboard_v1():
 
 @app.route('/race')
 def race():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     racers = get_all_racers()
     return render_template('race.html', racers=racers)
 
@@ -420,6 +564,7 @@ def get_leaderboard_data():
 
 @app.route('/get_racer_details/<int:id>')
 def get_racer_details(id):
+    print("hello- race-ready is clicked") 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
@@ -442,7 +587,7 @@ def get_racer_details(id):
             'organization': row[4],
             'address': row[3],
             'image': url_for('static', filename=f'images/{row[6]}') if row[6] else url_for('static', filename='images/collectors/stock.png'),
-            'time': seconds_to_time_format(row[7])
+            # 'time': seconds_to_time_format(row[7])
         }
         return jsonify(racer_data)
     
@@ -450,6 +595,9 @@ def get_racer_details(id):
 
 @app.route('/announcement', methods=['POST'])
 def update_announcement():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     new_announcement = request.form['announcement']
     # Save the new announcement to a file or database
     with open('announcement.txt', 'w') as f:
@@ -458,6 +606,9 @@ def update_announcement():
 
 @app.route('/title', methods=['POST'])
 def update_title():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
     new_title = request.form['title']
     # Save the new title to a file or database
     with open('title.txt', 'w') as f:
@@ -488,4 +639,4 @@ def get_announcement_route():
 
 if __name__ == '__main__':
     init_db()  # Ensure the database and table are created
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)

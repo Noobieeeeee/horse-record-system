@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Time Display</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        #time {
+            font-size: 2em;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Time Received from ESP32:</h1>
+    <div id="time">Waiting for data...</div>
+
+    <script>
+        // Connect to the WebSocket server
+        var socket = io();
+
+        // Listen for 'update_time' events from the server
+        socket.on('connect', function() {
+            console.log("Connected to the server");
+        });
+
+        socket.on('update_time', function(data) {
+            console.log("Received data: ", data.time);
+            // Update the time displayed on the page
+            document.getElementById('time').innerText = data.time;
+        });
+
+        socket.on('disconnect', function() {
+            console.log("Disconnected from the server");
+        });
+    </script>
+</body>
+</html>
+

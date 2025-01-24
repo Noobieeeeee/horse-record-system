@@ -314,7 +314,7 @@ table td img {
     margin: 20px;
 }
 
-#open-form-button, #open-announcement-button, #open-title-button #leaderboard-button {
+#open-form-button, #open-announcement-button, #open-title-button #leaderboard-button  {
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -328,7 +328,7 @@ table td img {
     font-weight: bold;
 }
 
-#open-form-button:hover, #open-announcement-button:hover, #open-title-button:hover {
+#open-form-button:hover, #open-announcement-button:hover, #open-title-button:hover, #settings-button:hover {
     background-color: #45a049;
 }
 
@@ -556,3 +556,83 @@ button:disabled {
         padding: 0.75rem 1rem;
     }
 }
+/* Settings Form */
+#settings-popup {
+    background: #ffffff; /* Light background */
+    padding: 1.5rem 2rem; /* Increased horizontal padding */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    animation: fadeIn 0.3s ease-in-out;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    width: 320px; /* Slightly wider for better spacing */
+  }
+  
+  #settings-popup form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Space between form elements */
+  }
+  
+  #settings-popup label {
+    font-size: 0.875rem;
+    color: #333333; /* Darker text for better readability */
+    margin-bottom: 0.25rem;
+  }
+  
+  #settings-popup input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #cccccc; /* Lighter border */
+    border-radius: 4px;
+    background: #f9f9f9; /* Light background for input */
+    color: #333333;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+  }
+  
+  #settings-popup input:focus {
+    border-color: #6c63ff; /* Purple accent color */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.1); /* Subtle focus effect */
+  }
+  
+  #settings-popup button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #6c63ff; /* Purple accent color */
+    color: #ffffff; /* White text */
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  #settings-popup button:hover {
+    background: #5a52e0; /* Slightly darker purple on hover */
+  }
+  
+  #settings-error {
+    color: #ff4d4d; /* Red for errors */
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    text-align: center;
+    display: none;
+  }
+  
+  /* Fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -55%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
+  }

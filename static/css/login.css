@@ -1,0 +1,125 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f5f5f5; /* Light gray background */
+  color: #333; /* Dark text for contrast */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+/* Login Container */
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff; /* White background */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Login Title */
+.login-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #333; /* Dark text */
+  text-align: center;
+}
+
+/* Form Group */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  color: #555; /* Medium gray for labels */
+  margin-bottom: 0.5rem;
+}
+
+/* Input with Icon */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon i {
+  position: absolute;
+  left: 10px;
+  color: #888; /* Gray icon color */
+  font-size: 1rem;
+}
+
+.input-with-icon input {
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.75rem 35px; /* Add padding for the icon */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 4px;
+  background: #f9f9f9; /* Light background for inputs */
+  color: #333; /* Dark text */
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.input-with-icon input:focus {
+  border-color: #6c63ff; /* Purple accent color */
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.1); /* Subtle focus effect */
+}
+
+/* Placeholder Text */
+.input-with-icon input::placeholder {
+  color: #aaa; /* Light gray placeholder text */
+  font-size: 0.875rem;
+}
+
+/* Login Button */
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #6c63ff; /* Purple accent color */
+  color: #ffffff; /* White text */
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.login-button:hover {
+  background: #5a52e0; /* Slightly darker purple on hover */
+}
+
+/* Error Message */
+.error-message {
+  color: #ff4d4d; /* Red for errors */
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

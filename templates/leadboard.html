@@ -4,8 +4,35 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/static/css/globals.css" />
     <link rel="stylesheet" href="/static/css/style_leaderboard.css" />
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
     <script>
+
+       var latestTime = '--:--:--';
+
+      // Connect to the WebSocket server
+      var socket = io();
+
+      // Listen for 'update_time' events from the server
+      socket.on('update_time', function(data) {
+        console.log("Received time data:", data.time);
+        // Update the timer display
+        // document.querySelector('.time-value').textContent = data.time;
+        latestTime = data.time;
+        fetchLeaderboardPage(1, 10);
+      });
+
+      // Handle connection and disconnection events
+      socket.on('connect', function() {
+        console.log("Connected to the server");
+      });
+
+      socket.on('disconnect', function() {
+        console.log("Disconnected from the server");
+      });
+
       // Add this helper function at the top of your script
       function formatTime(timeString) {
         if (timeString === '--:--:--' || !timeString) return '--:--:--';
@@ -56,7 +83,7 @@
         $('.racer-info .address').text(`Address: ${data.address || '---'}`);
         
         // Update timer
-        $('.time-value').text(data.time || '--:--:--');
+        $('.time-value').text(latestTime || '--:--:--'); //<--! made mistake -->
       }
 
       // Function to reset current racer details
