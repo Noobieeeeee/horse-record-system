@@ -3,7 +3,7 @@ import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
 from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO
-import serial
+# import serial
 import threading
 import time
 from werkzeug.security import generate_password_hash, check_password_hash
