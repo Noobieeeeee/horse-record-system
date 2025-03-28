@@ -639,4 +639,19 @@ def get_announcement_route():
 
 if __name__ == '__main__':
     init_db()  # Ensure the database and table are created
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    
+    # Define the host and port
+    host = '0.0.0.0'  # This makes it accessible on all network interfaces
+    port = 5000
+    
+    # Get all IP addresses where the server is accessible
+    import socket
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    
+    print(f"\nServer is running at:")
+    print(f"- http://127.0.0.1:{port}")
+    print(f"- http://{local_ip}:{port}")
+    print(f"(Press Ctrl+C to quit)\n")
+    
+    socketio.run(app, host=host, port=port, debug=True, allow_unsafe_werkzeug=True)
